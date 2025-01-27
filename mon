@@ -1,0 +1,49 @@
+#!/usr/bin/env python3
+
+import argparse
+
+from commands import add, delete, export, search, show
+from db.db_utils import \
+    initialize_database  # Import the database setup utility
+
+
+def main():
+    # Initialize the database (if needed)
+    initialize_database()
+    
+    parser = argparse.ArgumentParser(prog="mon", description="Console Note-Taking App")
+    
+    subparsers = parser.add_subparsers(dest="command", required=True)
+    
+    # Add commands
+    add_parser = subparsers.add_parser("add", help="Add a new note")
+    add_parser.add_argument("content", type=str, help="The note content")
+    add_parser.add_argument("--tags", type=str, help="Comma-separated tags for the note", default="")
+    
+    list_parser = subparsers.add_parser("show", help="List all notes")
+    list_parser.add_argument("--tag", type=str, help="Filter by a specific tag")
+    
+    delete_parser = subparsers.add_parser("delete", help="Delete a note")
+    delete_parser.add_argument("id", type=int, help="The ID of the note to delete")
+    
+    search_parser = subparsers.add_parser("search", help="Search notes by keyword")
+    search_parser.add_argument("keyword", type=str, help="The keyword to search for")
+    
+    export_parser = subparsers.add_parser("export", help="Export all notes to a file")
+    export_parser.add_argument("file", type=str, help="The file to export to")
+    
+    args = parser.parse_args()
+    
+    if args.command == "add":
+        add.add(args.content, args.tags)
+    elif args.command == "show":
+        show.list_all(args.tag)
+    elif args.command == "delete":
+        delete.delete(args.id)
+    elif args.command == "search":
+        search.search(args.keyword)
+    elif args.command == "export":
+        export.export(args.file)
+    
+if __name__ == "__main__":
+    main()
